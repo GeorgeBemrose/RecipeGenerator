@@ -1,34 +1,49 @@
-import os
-
-from flask import Flask, flash, redirect, render_template, request, session
-from flask_session import Session
+from flask import Flask, render_template
+import requests
+import csv
 
 # Configure application
-app = Flask(__name__)
-
-
-# Configure session to use filesystem (instead of signed cookies)
-app.config["SESSION_PERMANENT"] = False
-app.config["SESSION_TYPE"] = "filesystem"
-Session(app)
-
-@app.after_request
-def after_request(response):
-    """Ensure responses aren't cached"""
-    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-    response.headers["Expires"] = 0
-    response.headers["Pragma"] = "no-cache"
-    return response
-
+app = Flask(__name__, template_folder ='template')
 
 @app.route("/")
 def index():
     """Homepage"""
-
-
+    output = lookup()
     return render_template(
-        "index.html"
+        "index.html", output = output
     )
+    
+def lookup():
+    """Look up energy Gen"""
+    
+    headers = {
+    'Accept': 'application/json'
+    }
+    # Query API
+    try:
+        #r = requests.get('https://api.carbonintensity.org.uk/generation/2023-11-25T00:00Z/2024-01-01T24:00Z', params={}, headers = headers)
+        #r = requests.get('https://api.carbonintensity.org.uk/intensity', params={}, headers = headers)
+
+
+        url = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/findByIngredients"
+
+        querystring = {"ingredients":"apples,flour,sugar","number":"5","ignorePantry":"false","ranking":"1"}
+
+        headers = {
+            "X-RapidAPI-Key": "SIGN-UP-FOR-KEY",
+            "X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com"
+        }
+
+        response = requests.get(url, headers=headers, params=querystring)
+
+
+        #mix = list(csv.DictReader(response.content.decode("utf-8").splitlines()))
+        return response
+    
+    except (requests.RequestException, ValueError, KeyError, IndexError):
+        return "Error"
+
+    
 
 
 
