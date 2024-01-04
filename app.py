@@ -1,45 +1,49 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 import requests
 import csv
 import config
+import json
 
 # Configure application
 app = Flask(__name__, template_folder ='template')
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def index():
     """Homepage"""
-    output = lookup()
-    return render_template(
-        "index.html", output = output
-    )
+    if request.method == "POST":
+        ingredient = request.form.get("ingredient")
+        recipe = lookup(ingredient)
+        return render_template(
+            "index.html", recipe = recipe
+        )
+    else:
+
+        # TODO: Display the entries in the database on index.html
+        recipe = []
+        return render_template("index.html", recipe = recipe)
     
-def lookup():
+def lookup(ingredient):
     """Look up energy Gen"""
     
-    headers = {
-    'Accept': 'application/json'
-    }
-    # Query API
+
+        # Query API
     try:
-        #r = requests.get('https://api.carbonintensity.org.uk/generation/2023-11-25T00:00Z/2024-01-01T24:00Z', params={}, headers = headers)
-        #r = requests.get('https://api.carbonintensity.org.uk/intensity', params={}, headers = headers)
+        url = f'https://api.spoonacular.com/recipes/findByIngredients'
 
-
-        url = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/findByIngredients"
-
-        querystring = {"ingredients":"apples,flour,sugar","number":"5","ignorePantry":"false","ranking":"1"}
-
-        headers = {
-            "X-RapidAPI-Key": "config.api_key",
-            "X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com"
+        params = {
+            'apiKey': config.api_key,
+            'ingredients': ingredient,
+            'number': 5,
+            "ignorePantry":"false",
+            "ranking":"1"
         }
 
-        response = requests.get(url, headers=headers, params=querystring)
-
-
-        #mix = list(csv.DictReader(response.content.decode("utf-8").splitlines()))
-        return response
+        response = requests.get(url, params=params)
+        if response.status_code == 200:
+            data = response.json()
+            return data
+        return []
+        
     
     except (requests.RequestException, ValueError, KeyError, IndexError):
         return "Error"
