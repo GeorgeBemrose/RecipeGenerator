@@ -1,6 +1,7 @@
 from flask import Flask, render_template
 import requests
 import csv
+import config
 
 # Configure application
 app = Flask(__name__, template_folder ='template')
@@ -30,7 +31,7 @@ def lookup():
         querystring = {"ingredients":"apples,flour,sugar","number":"5","ignorePantry":"false","ranking":"1"}
 
         headers = {
-            "X-RapidAPI-Key": "SIGN-UP-FOR-KEY",
+            "X-RapidAPI-Key": "config.api_key",
             "X-RapidAPI-Host": "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com"
         }
 
