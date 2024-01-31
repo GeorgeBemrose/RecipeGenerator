@@ -11,33 +11,56 @@
             <h1>Recipe Generator</h1>
         </div>
         <div class="container">
+            <div class="mb-3"></div>
+            Search for Recipes by Ingredients:
               <form action="/" method="post">
-                <div class="mb-3">
-                    <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="ingredient" name="ingredient" placeholder="Ingredient" type="text">
+                
+                    <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="ingredient" name="ingredient" placeholder="Ingredients" type="text">
+                    <button class="btn btn-primary" type="submit">Search</button>
                 </div>
-                <button class="btn btn-primary" type="submit">Search</button>
+                
             </form>
-            </div>
+        </div>
             {% if request != [] %}
 
               <div class="section">
 
-                  <h2>Receipe Results</h2>
+                  
                   <table>
                       <thead>
                           <tr>
-                              <th>Receipe</th>
+                              <th>Recipe</th>
                               <th>Photo</th>
                           </tr>
                       </thead>
                       <tbody>
                           <!-- Loop through the database entries to display them in this table -->
-                          {% for recipe in recipe %}
+                          {% for recipeNameImage in recipeNameImage %}
                               <tr>
-                                  <td>{{ recipe.title }}</td>
-                                  <td><img src = {{recipe.image}} class = "image-class"></td>
+                                {% if recipeNameImage.id in recipe_dict %}
+                                    <td> <b> {{ recipe_dict[recipeNameImage.id].title }}</b>
+                                        <br>
+                                        Likes: {{ recipeNameImage.likes }}
+                                        <br>
+                                        Servings: {{ recipe_dict[recipeNameImage.id].servings }}
+                                        <br>
+                                        Ready in: {{ recipe_dict[recipeNameImage.id].readyInMinutes }} Minutes
+                                    </td>
+                                    <td><img src = {{ recipe_dict[recipeNameImage.id].image }} class = "image-class"></td>
+                                   
+                                    {% else %}
+                                        <td>Details not available</td>
+                                    {% endif %}  
+                                
+                                
+    
+                                  
                               </tr>
                           {% endfor %}
+
+                {% else %}
+                {{status_code}}
+                <!-- Doesn't output status_code currently, want to output to understand the reason for no results-->
                       </tbody>
                   </table>
               </div>
